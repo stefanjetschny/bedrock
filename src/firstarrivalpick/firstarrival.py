@@ -1,13 +1,17 @@
+import os
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # Use Agg backend for rendering plots to files
+import matplotlib.pyplot as plt
 from scipy.io import wavfile
 from scipy.signal import butter, lfilter
-import numpy as np
 import obspy
 from obspy.core import Stream, Trace
 from obspy.io.segy.segy import SEGYBinaryFileHeader, SEGYTraceHeader
-import os
 from first_breaks.sgy.reader import SGY
 from first_breaks.picking.task import Task
 from first_breaks.picking.picker_onnx import PickerONNX
+from first_breaks.desktop.graph import export_image
 
 # Define the range and construct file paths for 30Hz and 50Hz
 file_numbers = range(1, 30)  # From 1 to 29
@@ -68,23 +72,6 @@ convert_to_segy(data_filt_dict_50, samplerate_50, "filtered_data_50.sgy")
 
 print("Data has been converted to SEG-Y format.")
 
-# Define the path to your SEG-Y file
-segy_file = 'filtered_data_30.sgy'
-# segy_file = 'real_gather.sgy'
-
-# Read the SEG-Y file using ObsPy
-stream = obspy.read(segy_file)
-
-# To access individual traces and their headers
-for i, trace in enumerate(stream):
-    print(f"Trace {i + 1}:")
-    print(trace)
-
-from first_breaks.sgy.reader import SGY
-from first_breaks.picking.task import Task
-from first_breaks.picking.picker_onnx import PickerONNX
-import os
-
 def process_segy_files(filenames):
     picker = PickerONNX()
     for filename in filenames:
@@ -94,17 +81,28 @@ def process_segy_files(filenames):
                 sgy = SGY(filename)
                 
                 # Create a task for the picker
-                task = Task(source=sgy, traces_per_gather=12, maximum_time=100, gain=2)
+                task = Task(source=sgy, traces_per_gather=7, maximum_time=0, gain=2)
                 
                 # Process the task and pick the first break
                 task = picker.process_task(task)
                 
-                # Debug print to see picks
-                print(f"Picks for {filename}: {task.picks}")
+                picks = task.get_result()
+                print(picks.picks_in_samples)
                 
-                # Print all picks
-                pick_times = [pick for pick in task.picks]
-                print(f"All picks for {filename}: {pick_times}")
+                # Set pick color
+                task.picks.color = (255, 0, 0)
+                
+                # Export image using export_image function
+                image_filename = f"project_preview_{os.path.splitext(filename)[0]}.png"
+                export_image(task, image_filename,
+                             time_window=(0, 60),
+                             traces_window=(79.5, 90.5),
+                             show_processing_region=False,
+                             headers_total_pixels=80,
+                             height=500,
+                             width=700,
+                             hide_traces_axis=True)
+                print(f"Image saved as {image_filename}")
 
             except Exception as e:
                 print(f"Error processing {filename}: {e}")
