@@ -1,3 +1,12 @@
+# pip install -U first-breaks-picking
+# Installer Conda/Mini Conda
+# conda install conda-forge::obspy
+
+# Links
+# https://github.com/DaloroAT/first_breaks_picking
+# Travel times hjemme_10: https://github.com/stefanjetschny/bedrock/blob/main/data/bedrock_hjemme_10_2024/travel_times.xlsx
+# Analyse av data hjemme_10: https://docs.google.com/spreadsheets/d/1nYwR3StzZGs_PDxQuTspGLBca1e5amLq/edit?gid=790628807#gid=790628807
+
 import os
 import numpy as np
 import matplotlib
@@ -14,7 +23,7 @@ from first_breaks.picking.picker_onnx import PickerONNX
 from first_breaks.desktop.graph import export_image
 
 # Define the range and construct file paths for 30Hz and 50Hz
-file_numbers = range(1, 30)  # From 1 to 29
+file_numbers = range(1, 30)  # From 1 to 30
 file_paths_30 = [f"bedrock_hjemme_10_2024/hjem_{num}m_30.wav" for num in file_numbers]
 file_paths_50 = [f"bedrock_hjemme_10_2024/hjem_{num}m_50.wav" for num in file_numbers]
 
@@ -93,15 +102,8 @@ def process_segy_files(filenames):
                 task.picks.color = (255, 0, 0)
                 
                 # Export image using export_image function
-                image_filename = f"project_preview_{os.path.splitext(filename)[0]}.png"
-                export_image(task, image_filename,
-                             time_window=(0, 60),
-                             traces_window=(79.5, 90.5),
-                             show_processing_region=False,
-                             headers_total_pixels=80,
-                             height=500,
-                             width=700,
-                             hide_traces_axis=True)
+                image_filename = f"{os.path.splitext(filename)[0]}.png"
+                export_image(task, image_filename)
                 print(f"Image saved as {image_filename}")
 
             except Exception as e:
