@@ -24,8 +24,8 @@ from first_breaks.desktop.graph import export_image
 
 # Define the range and construct file paths for 30Hz and 50Hz
 file_numbers = range(1, 30)  # From 1 to 30
-file_paths_30 = [f"bedrock_hjemme_10_2024/hjem_{num}m_30.wav" for num in file_numbers]
-file_paths_50 = [f"bedrock_hjemme_10_2024/hjem_{num}m_50.wav" for num in file_numbers]
+file_paths_30 = [f"/home/sjet/repos/bedrock/data/bedrock_hjemme_10_2024/hjem_{num}m_30.wav" for num in file_numbers]
+file_paths_50 = [f"/home/sjet/repos/bedrock/data/bedrock_hjemme_10_2024/hjem_{num}m_50.wav" for num in file_numbers]
 
 # Define a function to read and process data
 def read_and_process(file_paths):
